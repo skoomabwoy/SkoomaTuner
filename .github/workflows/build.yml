@@ -36,11 +36,16 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
-      - name: Package VST3
-        shell: bash
+      - name: Package VST3 (Unix)
+        if: runner.os != 'Windows'
         run: |
           cd build/SkoomaTuner_artefacts/Release/VST3
           zip -r ../../../../SkoomaTuner-${{ matrix.name }}.zip SkoomaTuner.vst3
+
+      - name: Package VST3 (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path build/SkoomaTuner_artefacts/Release/VST3/SkoomaTuner.vst3 -DestinationPath SkoomaTuner-${{ matrix.name }}.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v5

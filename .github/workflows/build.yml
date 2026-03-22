@@ -3,6 +3,9 @@ name: Build VST3
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
@@ -33,8 +36,38 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
-      - name: Upload VST3
+      - name: Package VST3
+        shell: bash
+        run: |
+          cd build/SkoomaTuner_artefacts/Release/VST3
+          zip -r ../../../../SkoomaTuner-${{ matrix.name }}.zip SkoomaTuner.vst3
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v5
         with:
-          name: SkoomaTuner-${{ matrix.name }}-VST3
-          path: build/SkoomaTuner_artefacts/Release/VST3/SkoomaTuner.vst3
+          name: SkoomaTuner-${{ matrix.name }}
+          path: SkoomaTuner-${{ matrix.name }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Create Release
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        with:
+          path: artifacts
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(date +%Y.%m.%d)
+          gh release create "v${VERSION}" \
+            --title "SkoomaTuner v${VERSION}" \
+            --notes "VST3 tuner plugin for Linux, Windows, and macOS. Download the zip for your platform and extract the .vst3 bundle into your VST3 folder." \
+            artifacts/SkoomaTuner-Linux/SkoomaTuner-Linux.zip \
+            artifacts/SkoomaTuner-Windows/SkoomaTuner-Windows.zip \
+            artifacts/SkoomaTuner-macOS/SkoomaTuner-macOS.zip

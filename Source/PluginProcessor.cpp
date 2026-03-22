@@ -60,17 +60,29 @@ juce::AudioProcessorEditor* SkoomaTunerProcessor::createEditor()
 void SkoomaTunerProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     float ref = referenceFreq.load();
+    uint8_t strobe = strobeMode.load() ? 1 : 0;
+    uint8_t dark = darkMode.load() ? 1 : 0;
     destData.append(&ref, sizeof(float));
+    destData.append(&strobe, sizeof(uint8_t));
+    destData.append(&dark, sizeof(uint8_t));
 }
 
 void SkoomaTunerProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
+    auto* bytes = static_cast<const char*>(data);
+
     if (sizeInBytes >= static_cast<int>(sizeof(float)))
     {
         float ref;
-        std::memcpy(&ref, data, sizeof(float));
+        std::memcpy(&ref, bytes, sizeof(float));
         if (ref >= 432.0f && ref <= 452.0f)
             referenceFreq.store(ref);
+    }
+
+    if (sizeInBytes >= static_cast<int>(sizeof(float) + 2))
+    {
+        strobeMode.store(bytes[sizeof(float)] != 0);
+        darkMode.store(bytes[sizeof(float) + 1] != 0);
     }
 }
 

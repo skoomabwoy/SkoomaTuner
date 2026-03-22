@@ -34,8 +34,6 @@ private:
     float smoothedCents = 0.0f;
     float needleVelocity = 0.0f;
     float strobePhase = 0.0f;
-    bool strobeMode = false;
-    bool darkMode = true;
 
     static constexpr const char* noteNames[] = {
         "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"

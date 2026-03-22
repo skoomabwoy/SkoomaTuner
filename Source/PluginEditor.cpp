@@ -122,7 +122,9 @@ void SkoomaTunerEditor::timerCallback()
 
 void SkoomaTunerEditor::paint(juce::Graphics& g)
 {
-    const auto& t = darkMode ? darkTheme : lightTheme;
+    const bool dark = processor.darkMode.load();
+    const bool strobe = processor.strobeMode.load();
+    const auto& t = dark ? darkTheme : lightTheme;
 
     float w = static_cast<float>(getWidth());
     float scale = w / 300.0f;
@@ -145,7 +147,7 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
     else
         tuneColour = t.tuneRed;
 
-    if (!strobeMode)
+    if (!strobe)
     {
         // --- Gauge ---
         float arcStart = juce::MathConstants<float>::pi * 0.75f;
@@ -291,7 +293,7 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
 
     g.setColour(t.toggleIcon);
     g.setFont(iconFont.withHeight(iconSize * 0.6f));
-    juce::juce_wchar modeIcon = strobeMode ? juce::juce_wchar(0xf629) : juce::juce_wchar(0xf04c);
+    juce::juce_wchar modeIcon = strobe ? juce::juce_wchar(0xf629) : juce::juce_wchar(0xf04c);
     g.drawText(juce::String::charToString(modeIcon),
                juce::Rectangle<float>(modeX, modeY, iconSize, iconSize),
                juce::Justification::centred, false);
@@ -342,7 +344,7 @@ void SkoomaTunerEditor::mouseDown(const juce::MouseEvent& e)
     juce::Rectangle<float> modeRect(w - iconSize - iconPad, iconPad, iconSize, iconSize);
     if (modeRect.contains(e.position))
     {
-        strobeMode = !strobeMode;
+        processor.strobeMode.store(!processor.strobeMode.load());
         repaint();
         return;
     }
@@ -351,7 +353,7 @@ void SkoomaTunerEditor::mouseDown(const juce::MouseEvent& e)
     juce::Rectangle<float> themeRect(iconPad, iconPad, iconSize, iconSize);
     if (themeRect.contains(e.position))
     {
-        darkMode = !darkMode;
+        processor.darkMode.store(!processor.darkMode.load());
         repaint();
     }
 }

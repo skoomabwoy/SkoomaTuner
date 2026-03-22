@@ -44,6 +44,8 @@ public:
 
     std::atomic<float> currentFreq{0.0f};
     std::atomic<float> referenceFreq{440.0f};
+    std::atomic<bool> strobeMode{false};
+    std::atomic<bool> darkMode{true};
 
 private:
     low_high_cut::Dsp lowHighCut;

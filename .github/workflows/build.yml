@@ -2,6 +2,16 @@ name: Build VST3
 
 on:
   workflow_dispatch:
+    inputs:
+      platforms:
+        description: 'Platforms to build'
+        type: choice
+        options:
+          - all
+          - linux
+          - windows
+          - macos
+        default: 'all'
 
 permissions:
   contents: write
@@ -9,20 +19,31 @@ permissions:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
             name: Linux
+            key: linux
           - os: windows-latest
             name: Windows
+            key: windows
           - os: macos-latest
             name: macOS
+            key: macos
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.name }}
+    if: ${{ inputs.platforms == 'all' || inputs.platforms == matrix.key }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
+
+      - name: Cache CMake build
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: ${{ matrix.key }}-deps-${{ hashFiles('CMakeLists.txt') }}
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -48,20 +69,21 @@ jobs:
         run: Compress-Archive -Path build/SkoomaTuner_artefacts/Release/VST3/SkoomaTuner.vst3 -DestinationPath SkoomaTuner-${{ matrix.name }}.zip
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: SkoomaTuner-${{ matrix.name }}
           path: SkoomaTuner-${{ matrix.name }}.zip
 
   release:
     needs: build
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     name: Create Release
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
 
@@ -69,10 +91,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION=$(date +%Y.%m.%d)
+          VERSION=$(date +%Y.%m.%d)-$(echo ${{ github.sha }} | cut -c1-7)
+          FILES=""
+          for f in artifacts/SkoomaTuner-*/SkoomaTuner-*.zip; do
+            [ -f "$f" ] && FILES="$FILES $f"
+          done
           gh release create "v${VERSION}" \
             --title "SkoomaTuner v${VERSION}" \
-            --notes "VST3 tuner plugin for Linux, Windows, and macOS. Download the zip for your platform and extract the .vst3 bundle into your VST3 folder." \
-            artifacts/SkoomaTuner-Linux/SkoomaTuner-Linux.zip \
-            artifacts/SkoomaTuner-Windows/SkoomaTuner-Windows.zip \
-            artifacts/SkoomaTuner-macOS/SkoomaTuner-macOS.zip
+            --notes "VST3 tuner plugin. Download the zip for your platform and extract the .vst3 bundle into your VST3 folder." \
+            $FILES

@@ -8,7 +8,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "dsp/low_high_cut.h"
-#include "dsp/tuner.hpp"
+#include "dsp/pitch_tracker.h"
 #include <atomic>
 #include <memory>
 #include <vector>
@@ -49,7 +49,7 @@ public:
 
 private:
     low_high_cut::Dsp lowHighCut;
-    std::unique_ptr<tuner> pitchDsp;
+    std::unique_ptr<PitchTracker> pitchTracker;
     std::vector<float> workBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SkoomaTunerProcessor)

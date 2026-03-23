@@ -64,22 +64,58 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
-      - name: Package VST3 (Unix)
-        if: runner.os != 'Windows'
+      - name: Package VST3 (Linux)
+        if: runner.os == 'Linux'
         run: |
           cd build/SkoomaTuner_artefacts/Release/VST3
           zip -r ../../../../SkoomaTuner-${{ matrix.name }}.zip SkoomaTuner.vst3
+
+      - name: Package VST3 (macOS DMG)
+        if: runner.os == 'macOS'
+        run: |
+          DMG_DIR=dmg_contents
+          mkdir -p "$DMG_DIR"
+          cp -R build/SkoomaTuner_artefacts/Release/VST3/SkoomaTuner.vst3 "$DMG_DIR/"
+          ln -s /Library/Audio/Plug-Ins/VST3 "$DMG_DIR/VST3 Plug-Ins"
+          cat > "$DMG_DIR/README.txt" << 'README'
+          SkoomaTuner — VST3 Tuner Plugin
+
+          INSTALLATION
+          1. Drag SkoomaTuner.vst3 into the "VST3 Plug-Ins" folder.
+             This links to /Library/Audio/Plug-Ins/VST3 (system-wide).
+             You can also use ~/Library/Audio/Plug-Ins/VST3 (per-user).
+          2. Open Terminal and run:
+             xattr -cr /Library/Audio/Plug-Ins/VST3/SkoomaTuner.vst3
+             (adjust the path if you installed to a different location)
+          3. Restart your DAW. SkoomaTuner will appear in your plugin list.
+
+          The xattr command is needed because the plugin is not signed
+          with an Apple Developer certificate. Without it macOS will
+          show a "damaged" warning and refuse to load the plugin.
+          README
+          hdiutil create -volname SkoomaTuner \
+            -srcfolder "$DMG_DIR" \
+            -ov -format UDZO \
+            SkoomaTuner-${{ matrix.name }}.dmg
 
       - name: Package VST3 (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: Compress-Archive -Path build/SkoomaTuner_artefacts/Release/VST3/SkoomaTuner.vst3 -DestinationPath SkoomaTuner-${{ matrix.name }}.zip
 
-      - name: Upload artifact
+      - name: Upload artifact (zip)
+        if: runner.os != 'macOS'
         uses: actions/upload-artifact@v7
         with:
           name: SkoomaTuner-${{ matrix.name }}
           path: SkoomaTuner-${{ matrix.name }}.zip
+
+      - name: Upload artifact (dmg)
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: SkoomaTuner-${{ matrix.name }}
+          path: SkoomaTuner-${{ matrix.name }}.dmg
 
   release:
     needs: build
@@ -100,7 +136,7 @@ jobs:
         run: |
           VERSION=$(date +%Y.%m.%d)-$(echo ${{ github.sha }} | cut -c1-7)
           FILES=""
-          for f in artifacts/SkoomaTuner-*/SkoomaTuner-*.zip; do
+          for f in artifacts/SkoomaTuner-*/SkoomaTuner-*.zip artifacts/SkoomaTuner-*/SkoomaTuner-*.dmg; do
             [ -f "$f" ] && FILES="$FILES $f"
           done
           gh release create "v${VERSION}" \

@@ -13,9 +13,10 @@ Needle and strobe modes, dark and light themes. Spring-damped needle physics.
 
 ## Install
 
-Download the VST3 for your platform from the [Releases](https://github.com/skoomabwoy/SkoomaTuner/releases) page. Extract and copy the `.vst3` bundle to your VST3 folder.
+Download the VST3 for your platform from the [Releases](https://github.com/skoomabwoy/SkoomaTuner/releases) page.
 
-Supported platforms: **Linux**, **Windows**, **macOS**.
+- **Linux / Windows**: Extract the `.zip` and copy the `.vst3` bundle to your VST3 folder.
+- **macOS**: Open the `.dmg`, drag `SkoomaTuner.vst3` into the `VST3 Plug-Ins` folder, then run `xattr -cr ~/Library/Audio/Plug-Ins/VST3/SkoomaTuner.vst3` in Terminal.
 
 <details>
 <summary>Alternatively, you can build from source</summary>
@@ -33,7 +34,7 @@ Copy `build/SkoomaTuner_artefacts/Release/VST3/SkoomaTuner.vst3/` to your VST3 f
 
 ## Credits
 
-Pitch detection from [StompTuner](https://github.com/brummer10/StompTuner) by Hermann Meyer (brummer10), derived from [Guitarix](https://guitarix.org/). NSDF algorithm based on work by Philip McLeod (Tartini). Resampler: [zita-resampler](https://kokkinizita.linuxaudio.org/linuxaudio/) by Fons Adriaensen. Icons: [Font Awesome Free](https://fontawesome.com/) (SIL OFL 1.1).
+Pitch detection from [StompTuner](https://github.com/brummer10/StompTuner) by Hermann Meyer (brummer10), derived from [Guitarix](https://guitarix.org/). NSDF algorithm based on work by Philip McLeod (Tartini). Icons: [Font Awesome Free](https://fontawesome.com/) (SIL OFL 1.1).
 
 ## License
 

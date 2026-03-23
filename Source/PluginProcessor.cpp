@@ -21,11 +21,11 @@ void SkoomaTunerProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 
     workBuffer.resize(static_cast<size_t>(samplesPerBlock));
 
-    pitchDsp = std::make_unique<tuner>([this]() {
-        currentFreq.store(pitchDsp->get_freq(), std::memory_order_release);
+    pitchTracker = std::make_unique<PitchTracker>([this]() {
+        currentFreq.store(pitchTracker->get_estimated_freq(), std::memory_order_release);
     });
-    pitchDsp->init(static_cast<unsigned int>(sampleRate));
-    tuner::set_fast_note(*pitchDsp, true);
+    pitchTracker->init(static_cast<unsigned int>(sampleRate));
+    pitchTracker->set_fast_note_detection(true);
 }
 
 void SkoomaTunerProcessor::processBlock(juce::AudioBuffer<float>& buffer,
@@ -33,7 +33,7 @@ void SkoomaTunerProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 {
     juce::ScopedNoDenormals noDenormals;
 
-    if (!pitchDsp)
+    if (!pitchTracker)
         return;
 
     auto* channelData = buffer.getReadPointer(0);
@@ -44,12 +44,12 @@ void SkoomaTunerProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
     std::memcpy(workBuffer.data(), channelData, static_cast<size_t>(numSamples) * sizeof(float));
     low_high_cut::Dsp::compute_static(numSamples, workBuffer.data(), workBuffer.data(), &lowHighCut);
-    pitchDsp->feed_tuner(numSamples, workBuffer.data());
+    pitchTracker->add(numSamples, workBuffer.data());
 }
 
 void SkoomaTunerProcessor::releaseResources()
 {
-    pitchDsp.reset();
+    pitchTracker.reset();
 }
 
 juce::AudioProcessorEditor* SkoomaTunerProcessor::createEditor()

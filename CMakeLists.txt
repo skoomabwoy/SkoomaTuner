@@ -32,10 +32,7 @@ FetchContent_MakeAvailable(fftw3)
 # DSP sources (extracted from StompTuner)
 set(DSP_SOURCES
     Source/dsp/pitch_tracker.cpp
-    Source/dsp/tuner.cc
     Source/dsp/low_high_cut.cc
-    Source/dsp/resampler.cc
-    Source/dsp/resampler-table.cc
 )
 
 juce_add_plugin(SkoomaTuner

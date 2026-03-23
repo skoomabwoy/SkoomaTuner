@@ -24,8 +24,8 @@
 #define PITCH_TRACKER_H_
 
 #include <assert.h>
-#include <zita-resampler/resampler.h>
 #include <fftw3.h>
+#include <algorithm>
 #include <cstring>
 #include <cmath>
 #include <functional>
@@ -77,9 +77,7 @@ class PitchTracker {
     bool            error;
     int             tick;
     PitchTrackerWorker worker;
-    Resampler       resamp;
     int             m_sampleRate;
-    int             fixed_sampleRate;
     float           m_freq;
     // Value of the threshold above which
     // the processing is activated.

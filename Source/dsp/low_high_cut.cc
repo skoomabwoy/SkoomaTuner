@@ -39,7 +39,7 @@ inline void Dsp::init(uint32_t sample_rate)
 {
 	fSampleRate = sample_rate;
 	fConst0 = std::min<double>(192000.0, std::max<double>(1.0, double(fSampleRate)));
-	fConst1 = std::tan((3138.4510609362032 / fConst0));
+	fConst1 = std::tan((6911.503837897544 / fConst0));
 	fConst2 = (1.0 / fConst1);
 	fConst3 = (1.0 / (((fConst2 + 0.76536686473017945) / fConst1) + 1.0));
 	fConst4 = (1.0 / (((fConst2 + 1.8477590650225735) / fConst1) + 1.0));

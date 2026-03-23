@@ -292,11 +292,24 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
     g.drawRoundedRectangle(modeX, modeY, iconSize, iconSize, 3.0f * scale, 1.0f * scale);
 
     g.setColour(t.toggleIcon);
-    g.setFont(iconFont.withHeight(iconSize * 0.6f));
-    juce::juce_wchar modeIcon = strobe ? juce::juce_wchar(0xf629) : juce::juce_wchar(0xf04c);
-    g.drawText(juce::String::charToString(modeIcon),
-               juce::Rectangle<float>(modeX, modeY, iconSize, iconSize),
-               juce::Justification::centred, false);
+    if (strobe) {
+        g.setFont(iconFont.withHeight(iconSize * 0.6f));
+        g.drawText(juce::String::charToString(juce::juce_wchar(0xf629)),
+                   juce::Rectangle<float>(modeX, modeY, iconSize, iconSize),
+                   juce::Justification::centred, false);
+    } else {
+        // Mixer icon (two chevrons) rotated 90° — triangular markers
+        juce::Path mixerPath;
+        mixerPath.addTriangle(0.0f, 0.0f, 0.38f, 0.5f, 0.0f, 1.0f);
+        mixerPath.addTriangle(1.0f, 0.0f, 0.62f, 0.5f, 1.0f, 1.0f);
+        auto area = juce::Rectangle<float>(modeX, modeY, iconSize, iconSize).reduced(iconSize * 0.22f);
+        auto transform = juce::AffineTransform()
+            .translated(-0.5f, -0.5f)
+            .rotated(juce::MathConstants<float>::halfPi)
+            .scaled(area.getWidth())
+            .translated(area.getCentreX(), area.getCentreY());
+        g.fillPath(mixerPath, transform);
+    }
 
     // --- Text displays (only when signal present) ---
     if (displayFreq > 0.0f)

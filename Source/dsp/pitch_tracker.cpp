@@ -29,13 +29,11 @@
  */
 
 
-// downsampling factor
-static const int DOWNSAMPLE = 2;
 static const float SIGNAL_THRESHOLD_ON = 0.001;
 static const float SIGNAL_THRESHOLD_OFF = 0.0009;
 static const float TRACKER_PERIOD = 0.1;
-// The size of the read buffer
-static const int FFT_SIZE = 2048;
+// The size of the read buffer — 4096 covers down to ~23 Hz at 48 kHz
+static const int FFT_SIZE = 4096;
 
 ///////////////////////// INTERNAL WORKER CLASS   //////////////////////
 
@@ -95,9 +93,7 @@ PitchTracker::PitchTracker(std::function<void ()>setFreq_)
     : new_freq(setFreq_),
       error(false),
       tick(0),
-      resamp(),
       m_sampleRate(),
-      fixed_sampleRate(41000),
       m_freq(-1),
       signal_threshold_on(SIGNAL_THRESHOLD_ON),
       signal_threshold_off(SIGNAL_THRESHOLD_OFF),
@@ -162,8 +158,7 @@ bool PitchTracker::setParameters(int sampleRate, int buffersize) {
     if (error) {
         return false;
     }
-    m_sampleRate = fixed_sampleRate / DOWNSAMPLE;
-    resamp.setup(sampleRate, m_sampleRate, 1, 16); // 16 == least quality
+    m_sampleRate = sampleRate;
 
     if (m_buffersize != buffersize) {
         m_buffersize = buffersize;
@@ -193,7 +188,6 @@ void PitchTracker::init(unsigned int samplerate) {
 void PitchTracker::reset() {
     tick = 0;
     m_bufferIndex = 0;
-    resamp.reset();
     m_freq = -1;
 }
 
@@ -201,23 +195,11 @@ void PitchTracker::add(int count, float* input) {
     if (error) {
         return;
     }
-    resamp.inp_count = count;
-    resamp.inp_data = input;
-    for (;;) {
-        resamp.out_data = &m_buffer[m_bufferIndex];
-        int n = FFT_SIZE - m_bufferIndex;
-        resamp.out_count = n;
-        resamp.process();
-        n -= resamp.out_count; // n := number of output samples
-        if (!n) { // all soaked up by filter
-            return;
-        }
-        m_bufferIndex = (m_bufferIndex + n) % FFT_SIZE;
-        if (resamp.inp_count == 0) {
-            break;
-        }
+    for (int i = 0; i < count; i++) {
+        m_buffer[m_bufferIndex] = input[i];
+        m_bufferIndex = (m_bufferIndex + 1) % FFT_SIZE;
     }
-    if (++tick * count >= m_sampleRate * DOWNSAMPLE * tracker_period) {
+    if (++tick * count >= m_sampleRate * tracker_period) {
         if (busy.load(std::memory_order_acquire)) {
             return;
         }
@@ -379,7 +361,7 @@ void PitchTracker::run() {
                                  m_fftwBufferTime[maxAutocorrIndex+1],
                                  maxAutocorrIndex+1, &x);
             x = m_sampleRate / x;
-            if (x > 999.0) {  // precision drops above 1000 Hz
+            if (x > 2154.0f) {  // C7 + 50 cents
                 x = 0.0;
             }
         }

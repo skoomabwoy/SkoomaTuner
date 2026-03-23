@@ -29,9 +29,9 @@
  */
 
 
-static const float SIGNAL_THRESHOLD_ON = 0.001;
-static const float SIGNAL_THRESHOLD_OFF = 0.0009;
-static const float TRACKER_PERIOD = 0.1;
+static const float SIGNAL_THRESHOLD_ON = 0.005;
+static const float SIGNAL_THRESHOLD_OFF = 0.0045;
+static const float TRACKER_PERIOD = 0.01;
 // The size of the read buffer — 4096 covers down to ~23 Hz at 48 kHz
 static const int FFT_SIZE = 4096;
 
@@ -95,9 +95,6 @@ PitchTracker::PitchTracker(std::function<void ()>setFreq_)
       tick(0),
       m_sampleRate(),
       m_freq(-1),
-      signal_threshold_on(SIGNAL_THRESHOLD_ON),
-      signal_threshold_off(SIGNAL_THRESHOLD_OFF),
-      tracker_period(TRACKER_PERIOD),
       m_buffersize(),
       m_fftSize(),
       m_buffer(new float[FFT_SIZE]),
@@ -133,23 +130,6 @@ PitchTracker::~PitchTracker() {
     fftwf_free(m_fftwBufferFreq);
     delete[] m_input;
     delete[] m_buffer;
-}
-
-void PitchTracker::set_threshold(float v) {
-    signal_threshold_on = v;
-    signal_threshold_off = v*0.9;
-}
-
-void PitchTracker::set_fast_note_detection(bool v) {
-    if (v) {
-	signal_threshold_on = SIGNAL_THRESHOLD_ON * 5;
-	signal_threshold_off = SIGNAL_THRESHOLD_OFF * 5;
-	tracker_period = TRACKER_PERIOD / 10;
-    } else {
-	signal_threshold_on = SIGNAL_THRESHOLD_ON;
-	signal_threshold_off = SIGNAL_THRESHOLD_OFF;
-	tracker_period = TRACKER_PERIOD;
-    }
 }
 
 bool PitchTracker::setParameters(int sampleRate, int buffersize) {
@@ -199,7 +179,7 @@ void PitchTracker::add(int count, float* input) {
         m_buffer[m_bufferIndex] = input[i];
         m_bufferIndex = (m_bufferIndex + 1) % FFT_SIZE;
     }
-    if (++tick * count >= m_sampleRate * tracker_period) {
+    if (++tick * count >= m_sampleRate * TRACKER_PERIOD) {
         if (busy.load(std::memory_order_acquire)) {
             return;
         }
@@ -314,7 +294,7 @@ void PitchTracker::run() {
     for (int k = 0; k < m_buffersize; ++k) {
         sum += fabs(m_input[k]);
     }
-    float threshold = (m_audioLevel ? signal_threshold_off : signal_threshold_on);
+    float threshold = (m_audioLevel ? SIGNAL_THRESHOLD_OFF : SIGNAL_THRESHOLD_ON);
     m_audioLevel = (sum / m_buffersize >= threshold);
     if ( m_audioLevel == false ) {
         if (m_freq != 0) {
@@ -370,9 +350,4 @@ void PitchTracker::run() {
         new_freq();
     }
 }
-
-float PitchTracker::get_estimated_note() {
-    return m_freq <= 0.0 ? 1000.0 : 12 * log2f(2.272727e-03f * m_freq);
-}
-
 

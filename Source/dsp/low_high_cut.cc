@@ -30,11 +30,6 @@ inline void Dsp::clear_state_f()
 	for (int l6 = 0; (l6 < 3); l6 = (l6 + 1)) fRec0[l6] = 0.0;
 }
 
-void Dsp::clear_state_f_static(Dsp *p)
-{
-	p->clear_state_f();
-}
-
 inline void Dsp::init(uint32_t sample_rate)
 {
 	fSampleRate = sample_rate;
@@ -84,12 +79,6 @@ void always_inline Dsp::compute(int count, float *input0, float *output0)
 void Dsp::compute_static(int count, float *input0, float *output0, Dsp *p)
 {
 	p->compute(count, input0, output0);
-}
-
-
-void Dsp::del_instance(Dsp *p)
-{
-	delete p;
 }
 
 }

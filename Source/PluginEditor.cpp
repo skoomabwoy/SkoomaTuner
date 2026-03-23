@@ -262,7 +262,6 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
                               cx, bandY + bandH - mw * 1.5f);
         g.fillPath(botMarker);
 
-        g.setColour(t.tickMajor);
         g.drawRoundedRectangle(bandX, bandY, bandW, bandH, 4.0f * scale, 1.0f * scale);
     }
 

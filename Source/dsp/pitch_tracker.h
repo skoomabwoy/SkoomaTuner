@@ -20,9 +20,6 @@
 
 #pragma once
 
-#ifndef PITCH_TRACKER_H_
-#define PITCH_TRACKER_H_
-
 #include <assert.h>
 #include <fftw3.h>
 #include <algorithm>
@@ -63,10 +60,7 @@ class PitchTracker {
     void            init(unsigned int samplerate);
     void            add(int count, float *input);
     float           get_estimated_freq() { return m_freq < 0 ? 0 : m_freq; }
-    float           get_estimated_note();
     void            reset();
-    void            set_threshold(float v);
-    void            set_fast_note_detection(bool v);
     static void     *static_run(void* p);
     std::atomic<bool> busy;
  private:
@@ -79,14 +73,6 @@ class PitchTracker {
     PitchTrackerWorker worker;
     int             m_sampleRate;
     float           m_freq;
-    // Value of the threshold above which
-    // the processing is activated.
-    float           signal_threshold_on;
-    // Value of the threshold below which
-    // the input audio signal is deactivated.
-    float           signal_threshold_off;
-    // Time between frequency estimates (in seconds)
-    float           tracker_period;
     // number of samples in input buffer
     int             m_buffersize;
     // Size of the FFT window.
@@ -108,6 +94,3 @@ class PitchTracker {
     // Plan to compute the IFFT of a given signal (with additional zero-padding).
     fftwf_plan      m_fftwPlanIFFT;
 };
-
-
-#endif  // PITCH_TRACKER_H_

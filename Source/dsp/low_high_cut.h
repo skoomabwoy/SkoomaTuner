@@ -39,10 +39,8 @@ private:
 public:
 	Dsp();
 	~Dsp();
-	static void clear_state_f_static(Dsp*);
 	static void init_static(uint32_t sample_rate, Dsp*);
 	static void compute_static(int count, float *input0, float *output0, Dsp*);
-	static void del_instance(Dsp *p);
 };
 
 }

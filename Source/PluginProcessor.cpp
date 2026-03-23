@@ -25,7 +25,6 @@ void SkoomaTunerProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
         currentFreq.store(pitchTracker->get_estimated_freq(), std::memory_order_release);
     });
     pitchTracker->init(static_cast<unsigned int>(sampleRate));
-    pitchTracker->set_fast_note_detection(true);
 }
 
 void SkoomaTunerProcessor::processBlock(juce::AudioBuffer<float>& buffer,

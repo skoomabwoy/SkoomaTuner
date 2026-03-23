@@ -266,7 +266,7 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
     }
 
     // --- Toggle: theme (top-left) ---
-    float iconSize = 22.0f * scale;
+    float iconSize = 33.0f * scale;
     float iconPad = 8.0f * scale;
 
     float themeX = iconPad;
@@ -291,24 +291,10 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
     g.drawRoundedRectangle(modeX, modeY, iconSize, iconSize, 3.0f * scale, 1.0f * scale);
 
     g.setColour(t.toggleIcon);
-    if (strobe) {
-        g.setFont(iconFont.withHeight(iconSize * 0.6f));
-        g.drawText(juce::String::charToString(juce::juce_wchar(0xf629)),
-                   juce::Rectangle<float>(modeX, modeY, iconSize, iconSize),
-                   juce::Justification::centred, false);
-    } else {
-        // Mixer icon (two chevrons) rotated 90° — triangular markers
-        juce::Path mixerPath;
-        mixerPath.addTriangle(0.0f, 0.0f, 0.38f, 0.5f, 0.0f, 1.0f);
-        mixerPath.addTriangle(1.0f, 0.0f, 0.62f, 0.5f, 1.0f, 1.0f);
-        auto area = juce::Rectangle<float>(modeX, modeY, iconSize, iconSize).reduced(iconSize * 0.22f);
-        auto transform = juce::AffineTransform()
-            .translated(-0.5f, -0.5f)
-            .rotated(juce::MathConstants<float>::halfPi)
-            .scaled(area.getWidth())
-            .translated(area.getCentreX(), area.getCentreY());
-        g.fillPath(mixerPath, transform);
-    }
+    g.setFont(iconFont.withHeight(iconSize * 0.6f));
+    g.drawText(juce::String::charToString(juce::juce_wchar(strobe ? 0xf629 : 0xf13a)),
+               juce::Rectangle<float>(modeX, modeY, iconSize, iconSize),
+               juce::Justification::centred, false);
 
     // --- Text displays (only when signal present) ---
     if (displayFreq > 0.0f)
@@ -349,7 +335,7 @@ void SkoomaTunerEditor::mouseDown(const juce::MouseEvent& e)
 {
     float w = static_cast<float>(getWidth());
     float scale = w / 300.0f;
-    float iconSize = 22.0f * scale;
+    float iconSize = 33.0f * scale;
     float iconPad = 8.0f * scale;
 
     // Mode toggle (top-right)

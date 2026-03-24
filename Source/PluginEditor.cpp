@@ -11,26 +11,26 @@ namespace {
 
 struct Theme {
     juce::Colour background;
-    juce::Colour tickMinor, tickMajor, tickCenter;
-    juce::Colour tuneGreen, tuneOrange, tuneRed, tuneNone;
-    juce::Colour labelText, freqText;
-    juce::Colour strobeBandBg, strobeBorder;
+    juce::Colour trackDim, trackBright, accent;
+    juce::Colour meterLow, meterMid, meterHigh, meterOff;
+    juce::Colour labelText, valueText;
+    juce::Colour panelBg, panelBorder;
     juce::Colour toggleBg, toggleBorder, toggleIcon;
 };
 
 const Theme darkTheme = {
     juce::Colour(0xff1a1a2e),   // background
-    juce::Colour(0xff555555),   // tickMinor
-    juce::Colour(0xffcccccc),   // tickMajor
-    juce::Colour(0xff00ff88),   // tickCenter
-    juce::Colour(0xff00ff88),   // tuneGreen
-    juce::Colour(0xffffaa00),   // tuneOrange
-    juce::Colour(0xffff4444),   // tuneRed
-    juce::Colour(0xff444444),   // tuneNone
+    juce::Colour(0xff555555),   // trackDim
+    juce::Colour(0xffcccccc),   // trackBright
+    juce::Colour(0xff00ff88),   // accent
+    juce::Colour(0xff00ff88),   // meterLow
+    juce::Colour(0xffffaa00),   // meterMid
+    juce::Colour(0xffff4444),   // meterHigh
+    juce::Colour(0xff444444),   // meterOff
     juce::Colour(0xff888888),   // labelText
-    juce::Colour(0xffaaaaaa),   // freqText
-    juce::Colour(0xff0d0d1a),   // strobeBandBg
-    juce::Colour(0xff333344),   // strobeBorder
+    juce::Colour(0xffaaaaaa),   // valueText
+    juce::Colour(0xff0d0d1a),   // panelBg
+    juce::Colour(0xff333344),   // panelBorder
     juce::Colour(0xff2a2a3e),   // toggleBg
     juce::Colour(0xff444455),   // toggleBorder
     juce::Colour(0xff999999),   // toggleIcon
@@ -38,17 +38,17 @@ const Theme darkTheme = {
 
 const Theme lightTheme = {
     juce::Colour(0xfff2f2f7),   // background
-    juce::Colour(0xffcccccc),   // tickMinor
-    juce::Colour(0xff555555),   // tickMajor
-    juce::Colour(0xff00aa55),   // tickCenter
-    juce::Colour(0xff00aa55),   // tuneGreen
-    juce::Colour(0xffdd8800),   // tuneOrange
-    juce::Colour(0xffdd2222),   // tuneRed
-    juce::Colour(0xffcccccc),   // tuneNone
+    juce::Colour(0xffcccccc),   // trackDim
+    juce::Colour(0xff555555),   // trackBright
+    juce::Colour(0xff00aa55),   // accent
+    juce::Colour(0xff00aa55),   // meterLow
+    juce::Colour(0xffdd8800),   // meterMid
+    juce::Colour(0xffdd2222),   // meterHigh
+    juce::Colour(0xffcccccc),   // meterOff
     juce::Colour(0xff888888),   // labelText
-    juce::Colour(0xff666666),   // freqText
-    juce::Colour(0xffe6e6ee),   // strobeBandBg
-    juce::Colour(0xffccccdd),   // strobeBorder
+    juce::Colour(0xff666666),   // valueText
+    juce::Colour(0xffe6e6ee),   // panelBg
+    juce::Colour(0xffccccdd),   // panelBorder
     juce::Colour(0xffe0e0ea),   // toggleBg
     juce::Colour(0xffbbbbcc),   // toggleBorder
     juce::Colour(0xff777777),   // toggleIcon
@@ -139,13 +139,13 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
     float absC = std::abs(smoothedCents);
     juce::Colour tuneColour;
     if (displayFreq <= 0.0f)
-        tuneColour = t.tuneNone;
+        tuneColour = t.meterOff;
     else if (absC < 3.0f)
-        tuneColour = t.tuneGreen;
+        tuneColour = t.meterLow;
     else if (absC < 15.0f)
-        tuneColour = t.tuneOrange;
+        tuneColour = t.meterMid;
     else
-        tuneColour = t.tuneRed;
+        tuneColour = t.meterHigh;
 
     if (!strobe)
     {
@@ -172,17 +172,17 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
 
             if (isCenter)
             {
-                g.setColour(t.tickCenter);
+                g.setColour(t.accent);
                 g.drawLine(x1, y1, x2, y2, 2.5f * scale);
             }
             else if (isMajor)
             {
-                g.setColour(t.tickMajor);
+                g.setColour(t.trackBright);
                 g.drawLine(x1, y1, x2, y2, 1.5f * scale);
             }
             else
             {
-                g.setColour(t.tickMinor);
+                g.setColour(t.trackDim);
                 g.drawLine(x1, y1, x2, y2, 1.0f * scale);
             }
         }
@@ -227,7 +227,7 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
         float bandX = (w - bandW) * 0.5f;
         float bandY = cy - bandH * 0.5f;
 
-        g.setColour(t.strobeBandBg);
+        g.setColour(t.panelBg);
         g.fillRoundedRectangle(bandX, bandY, bandW, bandH, 4.0f * scale);
 
         float barW = 14.0f * scale;
@@ -251,7 +251,7 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
 
         // Center markers and border use tickMajor for contrast
         float mw = 4.0f * scale;
-        g.setColour(t.tickMajor);
+        g.setColour(t.trackBright);
 
         juce::Path topMarker;
         topMarker.addTriangle(cx - mw, bandY, cx + mw, bandY, cx, bandY + mw * 1.5f);
@@ -310,7 +310,7 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
 
         float freqY = noteY + noteH * 1.15f;
         float freqH = 16.0f * scale;
-        g.setColour(t.freqText);
+        g.setColour(t.valueText);
         g.setFont(monoFont.withHeight(freqH));
         g.drawText(juce::String(displayFreq, 1) + " Hz",
                    juce::Rectangle<float>(0, freqY, w, freqH * 1.3f),

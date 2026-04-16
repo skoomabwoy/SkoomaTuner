@@ -1,7 +1,5 @@
 # skoomaTuner
 
-A minimal VST3 tuner plugin.
-
 <table><tr>
 <td><img src="screenshots/dark-theme-needle.png" width="200"></td>
 <td><img src="screenshots/dark-theme-strobe.png" width="200"></td>
@@ -11,11 +9,13 @@ A minimal VST3 tuner plugin.
 
 Needle and strobe modes, dark and light themes. Spring-damped needle physics.
 
-Part of a series of small, minimal VST3 plugins: see also [skoomaLoud](https://github.com/skoomabwoy/SkoomaLoud) (loudness meter).
+Part of a series of small, minimal VST3 plugins:
+- [skoomaLoud](https://github.com/skoomabwoy/skoomaLoud) (loudness meter)
+- [skoomaFilter](https://github.com/skoomabwoy/skoomaFilter) (LP filter)
 
 ## Install
 
-Download the VST3 for your platform from the [Releases](https://github.com/skoomabwoy/SkoomaTuner/releases) page.
+Download the VST3 for your platform from the [Releases](https://github.com/skoomabwoy/skoomaTuner/releases) page.
 
 - **Linux**: Extract the `.zip` and copy `skoomaTuner.vst3` to `~/.vst3/` or `/usr/lib/vst3/`.
 - **Windows**: Extract the `.zip` and copy `skoomaTuner.vst3` to `C:\Program Files\Common Files\VST3\`.
@@ -37,7 +37,10 @@ Copy `build/SkoomaTuner_artefacts/Release/VST3/skoomaTuner.vst3/` to your VST3 f
 
 ## Credits
 
-Pitch detection from [StompTuner](https://github.com/brummer10/StompTuner) by Hermann Meyer (brummer10), derived from [Guitarix](https://guitarix.org/). NSDF algorithm based on work by Philip McLeod (Tartini). Icons: [Boxicons](https://github.com/box-icons/boxicons-core) (MIT). Font: [JetBrains Mono](https://www.jetbrains.com/lp/mono/) (SIL OFL 1.1).
+- Pitch detection from [StompTuner](https://github.com/brummer10/StompTuner) by Hermann Meyer (brummer10)
+- NSDF algorithm based on work by Philip McLeod (Tartini)
+- Icons: [Boxicons](https://github.com/box-icons/boxicons-core) (MIT)
+- Font: [JetBrains Mono](https://www.jetbrains.com/lp/mono/) (SIL OFL 1.1)
 
 ## License
 

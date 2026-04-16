@@ -49,11 +49,12 @@ juce_add_plugin(SkoomaTuner
     COPY_PLUGIN_AFTER_BUILD FALSE
 )
 
-# Embedded font binary data
+# Embedded font + SVG icon binary data
 juce_add_binary_data(FontData
     SOURCES
         Source/fonts/JetBrainsMono-Bold-subset.ttf
-        Source/fonts/fa-solid-subset.ttf
+        Source/icons/theme.svg
+        Source/icons/meter.svg
 )
 
 target_sources(SkoomaTuner

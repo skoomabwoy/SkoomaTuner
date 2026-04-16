@@ -54,6 +54,15 @@ const Theme lightTheme = {
     juce::Colour(0xff777777),   // toggleIcon
 };
 
+void drawIcon(juce::Graphics& g, const juce::Drawable* src,
+              juce::Rectangle<float> rect, juce::Colour colour)
+{
+    if (src == nullptr) return;
+    auto d = src->createCopy();
+    d->replaceColour(juce::Colours::black, colour);
+    d->drawWithin(g, rect, juce::RectanglePlacement::centred, 1.0f);
+}
+
 } // anonymous namespace
 
 SkoomaTunerEditor::SkoomaTunerEditor(SkoomaTunerProcessor& p)
@@ -64,10 +73,8 @@ SkoomaTunerEditor::SkoomaTunerEditor(SkoomaTunerProcessor& p)
         BinaryData::JetBrainsMonoBoldsubset_ttfSize);
     monoFont = juce::Font(juce::FontOptions(typeface));
 
-    auto iconTypeface = juce::Typeface::createSystemTypefaceFor(
-        BinaryData::fasolidsubset_ttf,
-        BinaryData::fasolidsubset_ttfSize);
-    iconFont = juce::Font(juce::FontOptions(iconTypeface));
+    iconMeter = juce::Drawable::createFromImageData(BinaryData::meter_svg, BinaryData::meter_svgSize);
+    iconTheme = juce::Drawable::createFromImageData(BinaryData::theme_svg, BinaryData::theme_svgSize);
 
     constrainer.setFixedAspectRatio(1.0);
     constrainer.setMinimumSize(200, 200);
@@ -265,36 +272,27 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
         g.drawRoundedRectangle(bandX, bandY, bandW, bandH, 4.0f * scale, 1.0f * scale);
     }
 
-    // --- Toggle: mode (top-left) ---
+    // --- Toggles (hover shows background only) ---
     float iconSize = 33.0f * scale;
     float iconPad = 8.0f * scale;
 
-    float modeX = iconPad;
-    float modeY = iconPad;
-    g.setColour(t.toggleBg);
-    g.fillRoundedRectangle(modeX, modeY, iconSize, iconSize, 3.0f * scale);
-    g.setColour(t.toggleBorder);
-    g.drawRoundedRectangle(modeX, modeY, iconSize, iconSize, 3.0f * scale, 1.0f * scale);
+    juce::Point<float> mousePos;
+    bool mouseHere = isMouseOver(false);
+    if (mouseHere) mousePos = getMouseXYRelative().toFloat();
 
-    g.setColour(t.toggleIcon);
-    g.setFont(iconFont.withHeight(iconSize * 0.6f));
-    g.drawText(juce::String::charToString(juce::juce_wchar(0xf629)),
-               juce::Rectangle<float>(modeX, modeY, iconSize, iconSize),
-               juce::Justification::centred, false);
+    juce::Rectangle<float> modeRect(iconPad, iconPad, iconSize, iconSize);
+    if (mouseHere && modeRect.contains(mousePos)) {
+        g.setColour(t.toggleIcon.withAlpha(0.15f));
+        g.fillRoundedRectangle(modeRect, 3.0f * scale);
+    }
+    drawIcon(g, iconMeter.get(), modeRect.reduced(iconSize * 0.2f), t.toggleIcon);
 
-    // --- Toggle: theme (top-right) ---
-    float themeX = w - iconSize - iconPad;
-    float themeY = iconPad;
-    g.setColour(t.toggleBg);
-    g.fillRoundedRectangle(themeX, themeY, iconSize, iconSize, 3.0f * scale);
-    g.setColour(t.toggleBorder);
-    g.drawRoundedRectangle(themeX, themeY, iconSize, iconSize, 3.0f * scale, 1.0f * scale);
-
-    g.setColour(t.toggleIcon);
-    g.setFont(iconFont.withHeight(iconSize * 0.6f));
-    g.drawText(juce::String::charToString(juce::juce_wchar(0xf042)),
-               juce::Rectangle<float>(themeX, themeY, iconSize, iconSize),
-               juce::Justification::centred, false);
+    juce::Rectangle<float> themeRect(w - iconSize - iconPad, iconPad, iconSize, iconSize);
+    if (mouseHere && themeRect.contains(mousePos)) {
+        g.setColour(t.toggleIcon.withAlpha(0.15f));
+        g.fillRoundedRectangle(themeRect, 3.0f * scale);
+    }
+    drawIcon(g, iconTheme.get(), themeRect.reduced(iconSize * 0.2f), t.toggleIcon);
 
     // --- Text displays (only when signal present) ---
     if (displayFreq > 0.0f)

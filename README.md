@@ -37,7 +37,7 @@ Copy `build/SkoomaTuner_artefacts/Release/VST3/skoomaTuner.vst3/` to your VST3 f
 
 ## Credits
 
-Pitch detection from [StompTuner](https://github.com/brummer10/StompTuner) by Hermann Meyer (brummer10), derived from [Guitarix](https://guitarix.org/). NSDF algorithm based on work by Philip McLeod (Tartini). Icons: [Font Awesome Free](https://fontawesome.com/) (SIL OFL 1.1).
+Pitch detection from [StompTuner](https://github.com/brummer10/StompTuner) by Hermann Meyer (brummer10), derived from [Guitarix](https://guitarix.org/). NSDF algorithm based on work by Philip McLeod (Tartini). Icons: [Boxicons](https://github.com/box-icons/boxicons-core) (MIT). Font: [JetBrains Mono](https://www.jetbrains.com/lp/mono/) (SIL OFL 1.1).
 
 ## License
 

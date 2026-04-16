@@ -24,7 +24,7 @@ private:
     SkoomaTunerProcessor& processor;
 
     juce::Font monoFont;
-    juce::Font iconFont;
+    std::unique_ptr<juce::Drawable> iconMeter, iconTheme;
     juce::ComponentBoundsConstrainer constrainer;
 
     float displayFreq = 0.0f;

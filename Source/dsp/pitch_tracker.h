@@ -47,7 +47,6 @@ public:
     ~PitchTrackerWorker();
     void stop();
     void start(PitchTracker *pt);
-    bool is_running() const noexcept;
     std::condition_variable cv;
 };
 
@@ -60,7 +59,6 @@ class PitchTracker {
     void            init(unsigned int samplerate);
     void            add(int count, float *input);
     float           get_estimated_freq() { return m_freq < 0 ? 0 : m_freq; }
-    void            reset();
     static void     *static_run(void* p);
     std::atomic<bool> busy;
  private:

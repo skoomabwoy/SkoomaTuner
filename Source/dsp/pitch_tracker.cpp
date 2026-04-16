@@ -75,12 +75,6 @@ void PitchTrackerWorker::start(PitchTracker *pt) {
     });
 }
 
-bool PitchTrackerWorker::is_running() const noexcept {
-    return ( _execute.load(std::memory_order_acquire) && 
-             _thd.joinable() );
-}
-
-
 /////////////////////////  PitchTracker Class   ////////////////////////
 
 
@@ -163,12 +157,6 @@ bool PitchTracker::setParameters(int sampleRate, int buffersize) {
 
 void PitchTracker::init(unsigned int samplerate) {
     setParameters(samplerate, FFT_SIZE);
-}
-
-void PitchTracker::reset() {
-    tick = 0;
-    m_bufferIndex = 0;
-    m_freq = -1;
 }
 
 void PitchTracker::add(int count, float* input) {

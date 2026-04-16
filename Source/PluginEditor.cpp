@@ -14,8 +14,8 @@ struct Theme {
     juce::Colour trackDim, trackBright, accent;
     juce::Colour meterLow, meterMid, meterHigh, meterOff;
     juce::Colour labelText, valueText;
-    juce::Colour panelBg, panelBorder;
-    juce::Colour toggleBg, toggleBorder, toggleIcon;
+    juce::Colour panelBg;
+    juce::Colour toggleIcon;
 };
 
 const Theme darkTheme = {
@@ -30,9 +30,6 @@ const Theme darkTheme = {
     juce::Colour(0xff888888),   // labelText
     juce::Colour(0xffaaaaaa),   // valueText
     juce::Colour(0xff0d0d1a),   // panelBg
-    juce::Colour(0xff333344),   // panelBorder
-    juce::Colour(0xff2a2a3e),   // toggleBg
-    juce::Colour(0xff444455),   // toggleBorder
     juce::Colour(0xff999999),   // toggleIcon
 };
 
@@ -48,9 +45,6 @@ const Theme lightTheme = {
     juce::Colour(0xff888888),   // labelText
     juce::Colour(0xff666666),   // valueText
     juce::Colour(0xffe6e6ee),   // panelBg
-    juce::Colour(0xffccccdd),   // panelBorder
-    juce::Colour(0xffe0e0ea),   // toggleBg
-    juce::Colour(0xffbbbbcc),   // toggleBorder
     juce::Colour(0xff777777),   // toggleIcon
 };
 

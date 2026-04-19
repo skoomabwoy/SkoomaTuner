@@ -7,7 +7,7 @@
 <td><img src="screenshots/light-theme-strobe.png" width="200"></td>
 </tr></table>
 
-Needle and strobe modes, dark and light themes. Spring-damped needle physics.
+Needle and strobe modes, with note name + cents offset readout. Dark and light themes. Spring-damped needle physics.
 
 Part of a series of small, minimal VST3 plugins:
 - [skoomaLoud](https://github.com/skoomabwoy/skoomaLoud) (loudness meter)

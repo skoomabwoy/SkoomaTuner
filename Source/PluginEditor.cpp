@@ -289,32 +289,26 @@ void SkoomaTunerEditor::paint(juce::Graphics& g)
     drawIcon(g, iconTheme.get(), themeRect.reduced(iconSize * 0.2f), t.toggleIcon);
 
     // --- Text displays (only when signal present) ---
+    // Unified text band across Tuner/Loud/Image: main at 0.76w, secondary at 0.89w,
+    // placed below the arc endpoints (y ≈ 0.75w) so the needle sweep can't overlap.
     if (displayFreq > 0.0f)
     {
-        float noteY = cy + 20.0f * scale;
-        float noteH = 48.0f * scale;
+        const float mainH  = 34.0f * scale;
+        const float mainY  = 0.76f * w;
+        const float labelH = 14.0f * scale;
+        const float labelY = 0.89f * w;
 
         g.setColour(tuneColour);
-        g.setFont(monoFont.withHeight(noteH));
+        g.setFont(monoFont.withHeight(mainH));
         juce::String noteStr = juce::String(noteNames[displayNoteIndex]) + juce::String(displayOctave);
-        g.drawText(noteStr, juce::Rectangle<float>(0, noteY, w, noteH * 1.1f),
+        g.drawText(noteStr, juce::Rectangle<float>(0, mainY, w, mainH),
                    juce::Justification::centred, false);
 
-        float freqY = noteY + noteH * 1.15f;
-        float freqH = 16.0f * scale;
-        g.setColour(t.valueText);
-        g.setFont(monoFont.withHeight(freqH));
-        g.drawText(juce::String(displayFreq, 1) + " Hz",
-                   juce::Rectangle<float>(0, freqY, w, freqH * 1.3f),
-                   juce::Justification::centred, false);
-
-        float centsY = freqY + freqH * 1.4f;
-        float centsH = 14.0f * scale;
         int centsInt = static_cast<int>(std::round(displayCents));
         g.setColour(tuneColour);
-        g.setFont(monoFont.withHeight(centsH));
+        g.setFont(monoFont.withHeight(labelH));
         g.drawText((centsInt >= 0 ? "+" : "") + juce::String(centsInt) + " cents",
-                   juce::Rectangle<float>(0, centsY, w, centsH * 1.3f),
+                   juce::Rectangle<float>(0, labelY, w, labelH),
                    juce::Justification::centred, false);
     }
 }
